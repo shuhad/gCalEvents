@@ -40,6 +40,12 @@ class gCalendarController extends Controller
        return redirect($this->gcRepo->createAuthUrl($code));
         
     }
+	public function logout()
+    {
+       request()->session()->forget('access_token');
+	   return redirect()->away('https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=http://127.0.0.1:8000/');
+    }
+	
 
     /**
      * Store a newly created resource in storage.

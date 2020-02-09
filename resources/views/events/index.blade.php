@@ -22,12 +22,14 @@
 
 </center>
     <div id="page-body">
+	<a href="logout" class="btn btn-info float-right">Logout</a>
     <!-- [PERIOD SELECTOR] -->
     <div id="cal-date">
       <select id="cal-mth"></select>
       <select id="cal-yr"></select>
       <input id="cal-set" type="button" value="Show"/>
     </div>
+	
 
     <!-- [CALENDAR] -->
     <div id="cal-container"></div>

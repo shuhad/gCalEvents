@@ -24,4 +24,5 @@ Route::get('events', 'gCalendarController@events');
 Route::resource('gcalendar', 'gCalendarController');
 Route::get('/api/oauth', 'gCalendarController@oauth')->name('oauthCallback');
 Route::resource('/api/cal', 'gCalendarController');
+Route::get('logout', 'gCalendarController@logout');
 
