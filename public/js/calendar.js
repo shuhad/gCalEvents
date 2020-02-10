@@ -1,13 +1,45 @@
+// const getData = async () => {
+//     const response = await fetch('/api/cal');
+//     const allData = await response.json();
+//     return allData;
+// }
+
+// getData().then(val => {
+//    eventData=val;
+//    document.getElementById("cal-set").click();
+// });
 const getData = async () => {
-    const response = await fetch('/api/cal');
-    const allData = await response.json();
+    let allData = await makeRequest("GET", '/api/cal',true);
     return allData;
 }
-
 getData().then(val => {
-   eventData=val;
-   document.getElementById("cal-set").click();
+    eventData=val;
+    document.getElementById("cal-set").click();
 });
+
+function makeRequest(method, url) {
+    return new Promise(function (resolve, reject) {
+        let xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.onload = function () {
+            if (this.status >= 200 && this.status < 300) {
+                resolve(JSON.parse(xhr.response));
+            } else {
+                reject({
+                    status: this.status,
+                    statusText: xhr.statusText
+                });
+            }
+        };
+        xhr.onerror = function () {
+            reject({
+                status: this.status,
+                statusText: xhr.statusText
+            });
+        };
+        xhr.send();
+    });
+}
 
 var cal = {
   /* [PROPERTIES] */
@@ -34,6 +66,7 @@ var cal = {
     //cal.data = await (await fetch("http://127.0.0.1:8000/api/cal")).json();
     
     cal.data=eventData;
+    //console.log(cal.data);
     // DRAWING CALCULATIONS
     // Determine the number of blank squares before start of month
     var squares = [];
@@ -99,7 +132,7 @@ var cal = {
         if(dateArray.includes(specificDay))
           {  
             pos = cal.data.map(function(e) { return e.start.dateTime.split("T")[0] }).indexOf(specificDay);
-            cCell.innerHTML += "<div class='evt'>" + cal.data[pos].description + "</div>";
+            cCell.innerHTML += "<div class='evt'>" + cal.data[pos].summary + "</div>";
             cCell.innerHTML += "<div class='evtID' style='display:none'>" + cal.data[pos].id + "</div>";
           }
         cCell.addEventListener("click", function(){
