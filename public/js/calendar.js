@@ -117,9 +117,13 @@ var cal = {
     cRow = document.createElement("tr");
     cRow.classList.add("day");
     dateArray=[];
+    if(cal.data && cal.data.length>0){
       cal.data.forEach(function(element) {
-      dateArray.push(element.start.dateTime.split("T")[0]);
+        if (element.start.dateTime) {
+          dateArray.push(element.start.dateTime.split("T")[0]);
+        }
     })
+    }
 
       //console.log(dateArray[0]);  // output as wished: apple, banana, grape
     for (var i=0; i<total; i++) {
@@ -131,7 +135,11 @@ var cal = {
         specificDay=cal.sYear+'-'+String("0" + parseInt(cal.sMth+1)).slice(-2)+'-'+String("0" + squares[i]).slice(-2);
         if(dateArray.includes(specificDay))
           {  
-            pos = cal.data.map(function(e) { return e.start.dateTime.split("T")[0] }).indexOf(specificDay);
+            pos = cal.data.map(function(e) { 
+              if (e.start.dateTime) {
+                return e.start.dateTime.split("T")[0] 
+              }
+            }).indexOf(specificDay);
             cCell.innerHTML += "<div class='evt'>" + cal.data[pos].summary + "</div>";
             cCell.innerHTML += "<div class='evtID' style='display:none'>" + cal.data[pos].id + "</div>";
           }
@@ -208,11 +216,8 @@ specificDay+="T"+cureTime+"+01:00";
   del : function () {
     const f = document.myForm;
     if(f.elements.namedItem("evtID")!=null){
-      evtID=document.getElementById('evtID').value
-    const Http = new XMLHttpRequest();
-      const url='/api/cal/'+evtID;
-      Http.open("DELETE", url);
-      Http.send();
+    evtID=document.getElementById('evtID').value
+    makeRequest("DELETE",'/api/cal/'+evtID,true);
       function myUrl(){
           return window.location.replace(window.location.href);
       }
