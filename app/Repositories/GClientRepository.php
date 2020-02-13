@@ -16,6 +16,16 @@ Class GClientRepository implements GClientRepositoryInterface {
     }
 
     /*
+    **Set http client
+    */
+
+    public function httpClient (){
+        $httpClinet = new \GuzzleHttp\Client(['curl' => [CURLOPT_SSL_VERIFYPEER => false]]);
+        return $httpClinet;
+
+    }
+
+    /*
     **Set google client
     */
 
@@ -24,8 +34,8 @@ Class GClientRepository implements GClientRepositoryInterface {
         $client->setAuthConfig('client_secret.json');
         $client->addScope(Google_Service_Calendar::CALENDAR);
 
-        $guzzleClient = new \GuzzleHttp\Client(['curl' => [CURLOPT_SSL_VERIFYPEER => false]]);
-        $client->setHttpClient($guzzleClient);
+        //$guzzleClient = new \GuzzleHttp\Client(['curl' => [CURLOPT_SSL_VERIFYPEER => false]]);
+        $client->setHttpClient($this->httpClient());
         return $client;
     }
 

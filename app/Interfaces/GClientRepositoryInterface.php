@@ -9,6 +9,9 @@ interface GClientRepositoryInterface {
 
     public function setGoogleClient ();
 
+    public function httpClient ();
+
+
     /*
     **create auth url
     */

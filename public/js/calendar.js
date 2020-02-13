@@ -8,6 +8,8 @@
 //    eventData=val;
 //    document.getElementById("cal-set").click();
 // });
+var eventData;
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 const getData = async () => {
     let allData = await makeRequest("GET", '/api/cal',true);
     return allData;
@@ -21,6 +23,9 @@ function makeRequest(method, url) {
     return new Promise(function (resolve, reject) {
         let xhr = new XMLHttpRequest();
         xhr.open(method, url);
+        xhr.setRequestHeader('x-csrf-token', csrfToken);  
+        xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+        xhr.setRequestHeader("Accept", "application/json");     
         xhr.onload = function () {
             if (this.status >= 200 && this.status < 300) {
                 resolve(JSON.parse(xhr.response));
@@ -190,6 +195,7 @@ specificDay+="T"+cureTime+"+01:00";
     var eForm = document.createElement("form");
     eForm.name='myForm';
     eForm.method='POST';
+    tForm += "<input type='hidden' name='csrf-token' value='"+csrfToken+"' />";
     if(evtDesc){
       tForm += "<input type='hidden' name='evtID' id='evtID' value='"+evtID+"' />";
       tForm += "<input type='hidden' name='_method' value='PUT' />";
