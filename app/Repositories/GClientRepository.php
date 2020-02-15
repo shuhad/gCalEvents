@@ -76,19 +76,24 @@ Class GClientRepository implements GClientRepositoryInterface {
     */
     public function createEvent ($data) {
         try {
+            $description = filter_var($data->description, FILTER_SANITIZE_STRING);
+            $theDay = filter_var($data->theDay, FILTER_SANITIZE_STRING);
+            $startTime = filter_var($theDay.'T'.$data->startTime.'+01:00', FILTER_SANITIZE_STRING);
+            $endTime = filter_var($theDay.'T'.$data->endTime.'+01:00', FILTER_SANITIZE_STRING);
             $this->client->setAccessToken(Session('access_token'));
             $service = new Google_Service_Calendar($this->client);
             $event = new Google_Service_Calendar_Event([
-                'summary' => $data->description,
-                'description' => $data->description,
-                'start' => ['dateTime' => $data->start],
-                'end' => ['dateTime' => $data->start],
+                'summary' => $description,
+                'description' => $description,
+                'start' => ['dateTime' => $startTime],
+                'end' => ['dateTime' => $endTime],
                 'reminders' => ['useDefault' => true],
             ]);
+            
             $results = $service->events->insert($this->calendarId, $event);
             return true;
         } catch (\Exception $e) {
-            return false;
+            //return false;
         }
     }
 
@@ -97,34 +102,25 @@ Class GClientRepository implements GClientRepositoryInterface {
     */
     public function updateEvent ($data, $eventId) {
         try {
+            $description = filter_var($data->description, FILTER_SANITIZE_STRING);
+            $theDay = filter_var($data->theDay, FILTER_SANITIZE_STRING);
+            $startTime = filter_var($theDay.'T'.$data->startTime.'+01:00', FILTER_SANITIZE_STRING);
+            $endTime = filter_var($theDay.'T'.$data->endTime.'+01:00', FILTER_SANITIZE_STRING);
+
             $this->client->setAccessToken(Session('access_token'));
             $service = new Google_Service_Calendar($this->client);
             // retrieve the event from the API.
             $event = $service->events->get($this->calendarId, $eventId);
-
-            $event->setSummary($data->description);
-
-            $event->setDescription($data->description);
-
-            $startDateTime = Carbon::parse($data->start)->toRfc3339String();
-
-            $eventDuration = 30; //minutes
-
-            if ($data->has('end_date')) {
-                $endDateTime = Carbon::parse($data->start)->toRfc3339String();
-
-            } else {
-                $endDateTime = Carbon::parse($data->start)->addMinutes($eventDuration)->toRfc3339String();
-            }
-
+            $event->setSummary($description);
+            $event->setDescription($description);
             //start time
             $start = new Google_Service_Calendar_EventDateTime();
-            $start->setDateTime($startDateTime);
+            $start->setDateTime($startTime);
             $event->setStart($start);
 
-            //end time
+            // //end time
             $end = new Google_Service_Calendar_EventDateTime();
-            $end->setDateTime($endDateTime);
+            $end->setDateTime($endTime);
             $event->setEnd($end);
 
             $updatedEvent = $service->events->update($this->calendarId, $event->getId(), $event);

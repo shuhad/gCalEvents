@@ -11,6 +11,16 @@
     <div class="container">
 <center>
 
+  @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
   <?php if(isset($_SESSION['status']) && !empty($_SESSION['status'])){     
     echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
     '.$_SESSION["status"].'

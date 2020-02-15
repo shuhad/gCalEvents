@@ -7,6 +7,7 @@ use Session;
 use App\Repositories\GClientRepository;
 Use Alert;
 use App\Http\Requests\CreateEventValidation;
+use Illuminate\Support\Facades\Validator;
 class gCalendarController extends Controller
 {
     protected $gcRepo;
@@ -56,12 +57,21 @@ class gCalendarController extends Controller
     public function store(CreateEventValidation $request)
     {
         if (Session('access_token') != null) {
+            $validator = Validator::make($request->all(), [
+                 'description' => 'required',
+                 'csrf-token' => 'required',
+             ]);
+            if ($validator->fails()) {
+                 return redirect('events')
+                 ->withInput()
+                 ->withErrors($validator);
+             }
             $result = $this->gcRepo->createEvent($request);
             if ($result == false) {
                 Alert::error('Error', 'Something went wrong, try again');
                 return Redirect::to('events');
             }
-            Alert::success('Success', 'Event Created!');
+            Alert::success('Success', 'The event has been created');
             return Redirect::to('events');
         } else {
             return redirect()->route('oauthCallback');
@@ -88,7 +98,7 @@ class gCalendarController extends Controller
     {
         if (Session('access_token') != null) {
             // check if description is updated
-            if($request->description == $request->oldEvtDes){
+            if($request->description == $request->oldEvtDes && $request->startTime == $request->oldStartTime && $request->endTime == $request->oldEndTime){
                 Alert::info("Info", "The event does not need to be updated");
                 return Redirect::to('events');
             }
@@ -105,7 +115,7 @@ class gCalendarController extends Controller
                 Alert::error("Error", "Something went wrong!");
                 return Redirect::to('events');
             }
-            Alert::success("Success", "Event Updated!");
+            Alert::success("Success", "The event has been updated");
             return Redirect::to('events');
         } else {
             return redirect()->route('oauthCallback');
@@ -132,7 +142,7 @@ class gCalendarController extends Controller
                 Alert::error("Error", "Something went wrong!");
                 return Redirect::to('events');
             }
-            Alert::success("Success", "Event Deleted!");
+            Alert::success("Success", "The event has been deleted");
             return Redirect::to('events');
         } else {
             return redirect()->route('oauthCallback');

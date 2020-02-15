@@ -71,7 +71,7 @@ var cal = {
     //cal.data = await (await fetch("http://127.0.0.1:8000/api/cal")).json();
     
     cal.data=eventData;
-    //console.log(cal.data);
+    console.log(cal.data);
     // DRAWING CALCULATIONS
     // Determine the number of blank squares before start of month
     var squares = [];
@@ -147,6 +147,8 @@ var cal = {
             }).indexOf(specificDay);
             cCell.innerHTML += "<div class='evt'>" + cal.data[pos].summary + "</div>";
             cCell.innerHTML += "<div class='evtID' style='display:none'>" + cal.data[pos].id + "</div>";
+            cCell.innerHTML += "<div class='startT' style='display:none'>" + cal.data[pos].start.dateTime + "</div>";
+            cCell.innerHTML += "<div class='endT' style='display:none'>" + cal.data[pos].end.dateTime + "</div>";
           }
         cCell.addEventListener("click", function(){
           cal.show(this);
@@ -177,18 +179,26 @@ var cal = {
           evtDesc = childd.innerHTML;
           var evtID = el.querySelector('.evtID');
           evtID = evtID.innerHTML;
+          var startT = el.querySelector('.startT').innerHTML;
+          startT = startT.substring(11,19);
+          var endT = el.querySelector('.endT').innerHTML;
+          endT = endT.substring(11,19);
+
     }
     specificDay=cal.sYear+'-'+String("0" + parseInt(cal.sMth+1)).slice(-2)+'-'+String("0" + cal.sDay).slice(-2);
     let today = new Date();
 let cureTime = ("0" + today.getHours()).slice(-2) + ":" + ("0" + today.getMinutes()).slice(-2) + ":" + ("0" + today.getSeconds()).slice(-2);
-specificDay+="T"+cureTime+"+01:00";
+//specificDay+="T"+cureTime+"+01:00";
     // DRAW FORM
     var tForm = "<h1>" + (evtDesc ? "EDIT" : "ADD") + " EVENT</h1>";
     tForm += "<div id='evt-date'>" + cal.sDay + " " + cal.mName[cal.sMth] + " " + cal.sYear + "</div>";
+    tForm += "<label>Start Time</label> <input type='time' name='startTime' value='"+(startT ? startT : cureTime)+"' required />";
+    tForm += "&nbsp; <label>End Time</label> <input type='time' name='endTime' value='"+(endT ? endT : cureTime)+"' required />";
     tForm += "<textarea id='evt-details' name='description' required>" + (evtDesc ? evtDesc : "") + "</textarea>";
     tForm += "<input type='button' value='Close' onclick='cal.close()'/>";
     tForm += "<input type='button' value='Delete' id='test' onclick='cal.del()'/>";
-    tForm += "<input type='hidden' name='start' value='"+specificDay+"' />";
+    tForm += "<input type='hidden' name='theDay' value='"+specificDay+"' />";
+    
     tForm += "<input type='submit' value='Save'/>";
 
     // ATTACH
@@ -200,6 +210,8 @@ specificDay+="T"+cureTime+"+01:00";
       tForm += "<input type='hidden' name='evtID' id='evtID' value='"+evtID+"' />";
       tForm += "<input type='hidden' name='_method' value='PUT' />";
       tForm += "<input type='hidden' name='oldEvtDes' value='"+evtDesc+"' />";
+      tForm += "<input type='hidden' name='oldStartTime' value='"+startT+"' />";
+      tForm += "<input type='hidden' name='oldEndTime' value='"+endT+"' />";
       eForm.action='/api/cal/'+evtID;
     }
     else{
